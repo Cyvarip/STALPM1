@@ -106,19 +106,26 @@ subtractive = generator : ve.moogLadder(fcut,Q) :
 \end{lstlisting}
 
 
-Di seguito troviamo un Phaser Stereo chiamato “PHASERSYNTH”, costruito tramite una sequenza di N allpass, come dal modello di Curtis Roads su “The Computer Music Tutorial”, di cui il canale R agisce di fase opposta al canale L. Il segnale verrà reso stereofonico tramite la tecnica dello “Stereo Shuffling”. Lo “Superstereophaser” (così chiamato citando il film “Ritorno al futuro”), avrà 3 tipi di controlli tramite dei knob:
+Di seguito troviamo un Phaser Stereo chiamato “PHASERSYNTH” (fig. \ref{phaser}),
+costruito tramite una sequenza di N allpass, come dal modello di Curtis Roads su
+“The Computer Music Tutorial” \cite{cr96cmt}, di cui il canale R agisce di fase opposta al
+canale L. Il segnale verrà reso stereofonico tramite la tecnica dello
+“Stereo Shuffling” (fig. \ref{stereoshuffler}). Lo “Superstereophaser”
+(così chiamato citando il film “Ritorno al futuro”), avrà 3 tipi di controlli
+tramite dei knob:
 \begin{compactitem}
 \item LFO frequency
 \item Feedback
 \item Delay
 \end{compactitem}
 
+
 %-----------------------------------------------------
 %-------------------------larghezza massima del codice
 \begin{lstlisting}
 // PHASER
 lff = p_g(
-	vslider("[02] Lfo [style:knob]",0.358, 0, 16, 0.001))
+	vslider("[02] Lfo [style:knob]",0.35, 0, 16, 0.001))
 	: si.smoo;
 fbk = p_g(
 	vslider("[03] Feedback [style:knob]",
@@ -137,8 +144,8 @@ with{
   apseqL(N,d,g) = seq(i,N,allpassL(d,g));
   apseqR(N,d,g) = seq(i,N,allpassR(d,g));
 
-  l= _, (+:apseqL(N,d,g))~*(fb):> _;
-  r=  _, (+:apseqR(N,d,g))~*(-fb):> _;
+  l= _<: _, (+:apseqL(N,d,g))~*(fb):> _;
+  r= _<: _, (+:apseqR(N,d,g))~*(-fb):> _;
 };
 
 // STEREO SHUFFLER
@@ -156,6 +163,22 @@ superstereophaser = phaserLR(4,_,del,lfo,fbk) :
 \end{lstlisting}
 %-----------------------------------------------------
 %-------------------------larghezza massima del codice
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=.47\textwidth]{img/phaser}
+\caption{\textbf{Phaser}. Realizzato con una serie di N allpass \cite{cr96cmt} .}
+\label{phaser}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=.47\textwidth]{img/mid-side-shuffler}
+\caption{\textbf{Stereo Shuffler}. blablabla \cite{ab58}.}
+\label{stereoshuffler}
+\end{center}
+\end{figure}
 
 Lo “Superstereophaser” è posto sulla parte destra del synth e potrà essere bypassato tramite un apposito pulsante posto in cima alla sezione stessa.
 Successivamente, il nostro segnale entrerà all’interno di un numero N di chopper (Hard Limiter) che limiteranno il segnale in modo netto secondo una soglia prestabilita, seguiti da N filtri passa basso di diverso ordine, in modo da rendere più “smooth” il segnale generato, attenuando le armoniche superiori generate dai chopper e mantenere quelle inferiori.
@@ -191,7 +214,7 @@ master = (*(volume), *(volume));
 \end{lstlisting}
 
 Di seguito la struttura generale del programma, sia in forma di codice che
-rappresentata attraverso un diagramma a blocchi (fig.1):
+rappresentata attraverso un diagramma a blocchi (fig. \ref{process}):
 
 \begin{lstlisting}
 process = subtractive : phaser : master : mutes : meters;
@@ -201,154 +224,54 @@ process = subtractive : phaser : master : mutes : meters;
 \begin{center}
 \includegraphics[width=.47\textwidth]{img/process}
 \caption{\textbf{Process}. Diagramma a blocchi della struttura del synth.}
-\label{gr01}
+\label{process}
 \end{center}
 \end{figure}
 
 
-%-------------------------------------------------------------------------------
-\subsubsection*{UNNUMBERED SUB-SUB-SECTION}
-Some predictions of general relativity differ significantly from those of
-classical physics, especially concerning the passage of time, the geometry of
-space, the motion of bodies in free fall, and the propagation of light. Examples
-of such differences include gravitational time dilation, gravitational lensing,
-the gravitational redshift of light, and the gravitational time delay. The
-predictions of general relativity in relation to classical physics have been
-confirmed in all observations and experiments to date. Although general
-relativity is not the only relativistic theory of gravity, it is the simplest
-theory that is consistent with experimental data. However, unanswered questions
-remain, the most fundamental being how general relativity can be reconciled with
-the laws of quantum physics to produce a complete and self-consistent theory of
-quantum gravity.
 
-Einstein's theory has important astrophysical implications. For example, it
-implies the existence of black holes regions of space in which space and time
-are distorted in such a way that nothing, not even light, can escape as an
-end state for massive stars. There is ample evidence that the intense radiation
-emitted by certain kinds of astronomical objects is due to black holes. For
-example, microquasars and active galactic nuclei result from the presence of
-stellar black holes and supermassive black holes\ldots
-
-
-\vfill\null
-
-\begin{figure}[b]
-\begin{center}
-\includegraphics[width=.47\textwidth]{img/image1.png}
-\caption{\textbf{Spacetime curvature schematic}. Lattice analogy of the deformation
-of spacetime caused by a planetary mass.}
-\label{gr01}
-\end{center}
-\end{figure}
-
-\newpage % USE NEWPAGE TO FORCE COLUMNN INTERRUPTION
+% \newpage % USE NEWPAGE TO FORCE COLUMNN INTERRUPTION
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
-\section*{UNNUMBERED SECTION}
+\section*{CONCLUSIONI}
 
-\begin{quote}
-La musica non e` solo composizione. \\
-Non è artigianato, non è un mestiere. \\
-La musica è pensiero.\cite{nono85}.
-\end{quote}
+% \begin{quote}
+% La musica non e` solo composizione. \\
+% Non è artigianato, non è un mestiere. \\
+% La musica è pensiero.\cite{nono85}.
+% \end{quote}
 
-Some predictions of general relativity differ significantly from those of
-classical physics, especially concerning the passage of time, the geometry of
-space, the motion of bodies in free fall, and the propagation of light. Examples
-of such differences include gravitational time dilation, gravitational lensing,
-the gravitational redshift of light, and the gravitational time delay. The
-predictions of general relativity in relation to classical physics have been
-confirmed in all observations and experiments to date. Although general
-relativity is not the only relativistic theory of gravity, it is the simplest
-theory that is consistent with experimental data. However, unanswered questions
-remain, the most fundamental being how general relativity can be reconciled with
-the laws of quantum physics to produce a complete and self-consistent theory of
-quantum gravity.
+% \begin{table}[htp]
+% \begin{center}
+% \begin{tabular}{ll}
+% \textbf{Stages} & \textbf{Dur.} \\
+% \hline
+% \textbf{Omnidirectional Expositions} & 6 mo. \\
+% Sound-shape analysis and visualizations & \\
+% Sound-shape reproduction & \\
+% Sound-shape database design & \\
+% \hline
+% \textbf{Micro-Rhythm of sound-shape} & 12 mo. \\
+% Solo repertoire analysis & \\
+% Sound-shape explosion in practising & \\
+% From literature to shapes open-data & \\
+% \hline
+% \textbf{Rhythm of sound-shape interactions} & 12 mo. \\
+% Multiple sources multiple shapes & \\
+% Relationship and complexity perception & \\
+% \hline
+% \textbf{Sound-shape in musical composition} & 12 mo. \\
+% AI: unleashed writing opportunities & \\
+% AI: can you listen the time? & \\
+% \hline
+% \textbf{Final documentation} & 6 mo. \\
+% \end{tabular}
+% \label{timesheet}
+% \caption{Thinking Tetrahedral Today stages}
+% \end{center}
+% \end{table}%
 
-\begin{table}[htp]
-\begin{center}
-\begin{tabular}{ll}
-\textbf{Stages} & \textbf{Dur.} \\
-\hline
-\textbf{Omnidirectional Expositions} & 6 mo. \\
-Sound-shape analysis and visualizations & \\
-Sound-shape reproduction & \\
-Sound-shape database design & \\
-\hline
-\textbf{Micro-Rhythm of sound-shape} & 12 mo. \\
-Solo repertoire analysis & \\
-Sound-shape explosion in practising & \\
-From literature to shapes open-data & \\
-\hline
-\textbf{Rhythm of sound-shape interactions} & 12 mo. \\
-Multiple sources multiple shapes & \\
-Relationship and complexity perception & \\
-\hline
-\textbf{Sound-shape in musical composition} & 12 mo. \\
-AI: unleashed writing opportunities & \\
-AI: can you listen the time? & \\
-\hline
-\textbf{Final documentation} & 6 mo. \\
-\end{tabular}
-\label{timesheet}
-\caption{Thinking Tetrahedral Today stages}
-\end{center}
-\end{table}%
 
-Einstein's theory has important astrophysical implications. For example, it
-implies the existence of black holes regions of space in which space and time
-are distorted in such a way that nothing, not even light, can escape as an
-end state for massive stars. There is ample evidence that the intense radiation
-emitted by certain kinds of astronomical objects is due to black holes. For
-example, microquasars and active galactic nuclei result from the presence of
-stellar black holes and supermassive black holes, respectively. The bending of
-light by gravity can lead to the phenomenon of gravitational lensing, in which
-multiple images of the same distant astronomical object are visible in the sky.
-General relativity also predicts the existence of gravitational waves, which
-have since been observed directly by the physics collaboration LIGO. In addition,
-general relativity is the basis of current cosmological models of a consistently
-expanding universe.
-
-\begin{compactitem}
-\item Derivations of the Lorentz transformations
-\item Einstein–Hilbert action
-\item Tests of general relativity
-\item Two-body problem in general relativity
-\end{compactitem}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=.47\textwidth]{img/image2.jpg}
-\caption{Mind Mapping}
-\label{gs}
-\end{figure}
-
-\begin{equation}
-m(x,p,\theta) = (p*x) + ((1-p)*(x\cos\theta)
-\label{eq:mid}
-\end{equation}
-
-Some predictions of general relativity differ significantly from those of
-classical physics, especially concerning the passage of time, the geometry of
-space, the motion of bodies in free fall, and the propagation of light.
-
-%--------------------------------------------
-%----------------larghezza massima del codice
-\begin{lstlisting}
-mspan(x,p,rad) = m,s
-with{
-  m = (p*x)+((1-p)*(x*cos(rad)));
-  s = x*(sin(-rad));
-};
-\end{lstlisting}
-
-Examples
-of such differences include gravitational time dilation, gravitational lensing,
-the gravitational redshift of light, and the gravitational time delay. The
-predictions of general relativity in relation to classical physics have been
-confirmed in all observations and experiments to date. Although general
-relativity is not the only relativistic theory of gravity, it is the simplest
-theory that is consistent with experimental data.
 
 \vfill\null
 
