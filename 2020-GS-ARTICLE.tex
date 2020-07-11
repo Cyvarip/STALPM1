@@ -45,16 +45,31 @@
 Partendo dal presupposto che la finalità del corso di STALPM 1 fosse quella
 di costruire un oggetto multimimediale indirizzato al web e che quindi se ne
 potesse usufruire anche in modo "non-locale", si è ragionato fin dalle prime
-lezioni sulla tipologia dell'oggetto in questione. Abbiamo quindi effettuato
+lezioni sulla tipologia d'oggetto da realizzare. Abbiamo quindi effettuato
 un veloce brainstorming sicchè la realizzazione dell'oggetto multimediale
 potesse sia portarci ad una finalità pratica, cioè quella di potere utilizzare
 esso come un nostro strumento di composizione, sia di apprendimento dei concetti
-basilari del mondo della programmazione, a noi sconosciuto o quasi fino a quel
-momento. Il frutto dei nostri ragionamenti è stato quello di realizzare un synth,
-inizialmente con l'idea di basarci su di un modello presistente, poi quella di
-realizzarne un modello con una struttura dei vari moduli e percorso del segnale
-nuova, rispetto a quelle che erano i nostri pensieri al momento della decisione.
+basilari del mondo della programmazione (a noi sconosciuto o quasi fino a quel
+momento) e non solo. Il frutto dei nostri ragionamenti è stato quello di realizzare un synth,
+inizialmente con l'idea di basarci su di un modello fisico presistente, poi quella di
+realizzarne uno con una struttura tutta sua, con specifici moduli e percorsi del segnale
+totalmente nuovi, rispetto a quelli che erano i nostri pensieri al momento della decisione.
 Per la realizzazione dello "Superstereo Synth" si è utilizzato Faust \cite{faust}
+che utilizza un linguaggio di programmazione di tipo algebrico e dotato di IDE (interfaccia grafica), che
+ha reso molto più fluido il nostro lavoro. Faust genera un codice c++, ed è quindi in grado
+di essere multi-piattaforma, perfetto dunque per il nostro utilizzo. L'idea principale per
+la construzione del nostro synth si è basata principalmente su un modulo di generazione sonora, un filtro e
+un controllo d'ampiezza in uscita, per poi evolversi in qualcosa di più complesso \ref{superstereosynth} che verrà spiegata passo dopo passo nel paragrafo seguente. Il tutto è stato reso disponibile online grazie
+a Heroku tramite Wasm (WebAssembly), linguaggio di basso livello che permette di far girare sul web applicazioni in maniera molto efficente.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=.47\textwidth]{img/Superstereosynth}
+\caption{\textbf{Superstereosynth}. Interfaccia grafica completa.}
+\label{superstereosynth}
+\end{center}
+\end{figure}
+
 %-------------------------------------------------------------------------------
 \subsubsection*{DESCRIZIONE DEL CODICE}
 La parte iniziale del codice denominata “GUI” contiene tutti i gruppi grafici dentro i quali abbiamo inserito i vari elementi –grafici appunto- del nostro strumento di sintesi quali knob, fader, pulsanti e meter.
@@ -76,8 +91,10 @@ rmeter(x) = main(attach(
 meters = lmeter, rmeter;
 \end{lstlisting}
 
-Il modulo di sintesi sottrattiva chiamato “SUBTRACTIVE” contiene al suo interno un generatore di rumore bianco e uno di dente di sega con frequenza fissa, swichabili tramite un apposito pulsante. Il tutto va dentro un filtro risonante “Ladder” basato sul modello di Robert Moog con relativi controlli di f cut e Q factor, ed in seguito ad un cotrollo di ampiezza.
+Il modulo di sintesi sottrattiva chiamato “SUBTRACTIVE” contiene al suo interno un generatore di rumore bianco e uno di dente di sega con frequenza fissa (da noi indipendentemente scelta), swichabili tramite un apposito pulsante. Il tutto va dentro un filtro risonante “Ladder” basato sul modello di Robert Moog con relativi controlli di f cut e Q factor, ed in seguito ad un cotrollo di ampiezza.
 Il modulo di sottrattiva è posto nella parte destra del synth.
+
+
 
 
 %-----------------------------------------------------
@@ -85,7 +102,7 @@ Il modulo di sottrattiva è posto nella parte destra del synth.
 \begin{lstlisting}
 // SUBTRACTIVE
 // Sawfreq Custom
-sawfreq = 123;
+sawfreq = 234;
 generator = (no.noise *switch),
 	(os.sawtooth(sawfreq)*(1-switch)) :> _;
 switch = s_g(checkbox("[01] Saw/Noise")) : si.smoo;
@@ -104,16 +121,19 @@ subtractive = generator : ve.moogLadder(fcut,Q) :
 
 Di seguito troviamo un Phaser Stereo chiamato “PHASERSYNTH” (fig. \ref{phaser}),
 costruito tramite una sequenza di N allpass, come dal modello di Curtis Roads su
-“The Computer Music Tutorial” \cite{cr96cmt}, di cui il canale R agisce di fase opposta al
+“The Computer Music Tutorial” \cite{cr96cmt}, di cui il canale R dell'LFO agisce di fase opposta al
 canale L. Il segnale verrà reso stereofonico tramite la tecnica dello
-“Stereo Shuffling” (fig. \ref{stereoshuffler}). Lo “Superstereophaser”
-(così chiamato citando il film “Ritorno al futuro”), avrà 3 tipi di controlli
-tramite dei knob:
+“Stereo Shuffling” (fig. \ref{stereoshuffler}), creando quindi due matrici SDM \cite{ab58} (somma-differenza) di
+modo da avere un knob su cui poter controllare l'apertura stereofonica, agendo da solo segnale solo
+monofonico (knob full sx) e superstereo (knob full dx). Lo “Superstereophaser”
+(così chiamato, non solo lui ma anche lo stesso synth, citando il film “Ritorno al futuro”), avrà 3 tipi di controlli
+tramite appositi knob:
 \begin{compactitem}
 \item LFO frequency
 \item Feedback
 \item Delay
 \end{compactitem}
+
 
 
 %-----------------------------------------------------
@@ -154,7 +174,7 @@ sdm = somma,diff;
 wide = _, * (sqrt(pot));
 stereoshuffle= _,_ <: sdm : wide <: sdm;
 
-superstereophaser = phaserLR(4,_,del,lfo,fbk) :
+superstereophaser = phaserLR(8,_,del,lfo,fbk) :
 	stereoshuffle;
 \end{lstlisting}
 %-----------------------------------------------------
@@ -163,7 +183,7 @@ superstereophaser = phaserLR(4,_,del,lfo,fbk) :
 \begin{figure}[h]
 \begin{center}
 \includegraphics[width=.47\textwidth]{img/phaser}
-\caption{\textbf{Phaser}. Realizzato con una serie di N allpass \cite{cr96cmt} .}
+\caption{\textbf{Phaser}. Realizzato con una serie di N allpass.}
 \label{phaser}
 \end{center}
 \end{figure}
@@ -171,13 +191,13 @@ superstereophaser = phaserLR(4,_,del,lfo,fbk) :
 \begin{figure}[h]
 \begin{center}
 \includegraphics[width=.47\textwidth]{img/mid-side-shuffler}
-\caption{\textbf{Stereo Shuffler}. blablabla \cite{ab58}.}
+\caption{\textbf{Stereo Shuffler}. Si possono notare nel diagramma a blocchi le due matrici SDM.}
 \label{stereoshuffler}
 \end{center}
 \end{figure}
 
 Lo “Superstereophaser” è posto sulla parte destra del synth e potrà essere bypassato tramite un apposito pulsante posto in cima alla sezione stessa.
-Successivamente, il nostro segnale entrerà all’interno di un numero N di chopper (Hard Limiter) che limiteranno il segnale in modo netto secondo una soglia prestabilita, seguiti da N filtri passa basso di diverso ordine, in modo da rendere più “smooth” il segnale generato, attenuando le armoniche superiori generate dai chopper e mantenere quelle inferiori.
+Successivamente, il nostro segnale entrerà all’interno di un numero N di chopper o Hard Limiter (numero scelto diversamente da ogniuno di noi) che limiteranno il segnale in modo netto secondo una soglia prestabilita, seguiti da N filtri passa basso di diverso ordine (l'ordine dei filtri è stato scelto sempre in maniera indipendete da ogniuno di noi), in modo da rendere più “smooth” il segnale generato, attenuando le armoniche superiori generate dai chopper e mantenere quelle inferiori.
 
 \begin{lstlisting}
 // HARD LIMITER
@@ -185,7 +205,7 @@ chopper(a) = min(a) : max(-a);
 
 hardlimiter = chopper(0.7) :
 	fi.lowpass(12,15000): chopper(0.9) :
-	fi.lowpass6e(20000);
+	fi.lowpass(8,2500): fi.lowpass6e(20000);
 phchop = superstereophaser :
 	hardlimiter, hardlimiter;
  \end{lstlisting}
@@ -230,7 +250,34 @@ process = subtractive : phaser : master : mutes : meters;
 %-------------------------------------------------------------------------------
 %-------------------------------------------------------------------------------
 \section*{CONCLUSIONI}
+Devo ammettere che inizialmente l'idea di programmare da zero,
+in questo caso un synth completo, mi intimoriva parecchio; in fin dei conti
+però non è stato poi così complesso anzi, si è rivelato interessante e soprattutto
+molto divertente. Mi è piaciuto come durante il corso, non ci venisse richiesto semplicemente
+di "fare" una determinata cosa, ma venissimo guidati e indotti a ragionare su quali
+fossero le possibili strade da percorrere. Non conoscevo Faust, ma ho imparato e sto imparando a
+capirne le sue funzionalità e penso che sia un linguaggio abbastanza immediato e intuitivo,
+grazie non solo alla sua documentazione, ma anche dalle righe di codice già disponibili che
+possono essere studiate e analizzate con la possibilità di imparare molto da loro. Per quanto riguarda il synth
+sono molto soddisfatto della sua resa sonora, a maggior ragione dopo le mie persanali modifiche; molto
+probabilmente lo userò per delle mie personali composizioni, data la sua flessibilità
+(posso ovviamente modificarlo, riprogrammando il codice). Credo che imparare e saper
+governare la programmazione sia cosa più che fondamentale per un musicista del ventunesimo secolo.
+A tal proposito, vorrei anche menzionare l'esperienza che nelle ultime lezioni abbiamo
+affrontato con il linguaggio LaTeX \ref{latex} per la scrittura di questo paper, anch'essa molto utile a fronte
+di una futura pubblicazione o anche semplicemente per la stesura
+% (mi manca il termine)
+della mia tesi di laurea. In sostanza, posso dire che aver seguito questo corso mi ha dato l'opportunità di
+acquisire determinati valori aggiunti che non solo hanno arricchito il mio bagaglio di conoscenze,
+ma hanno fatto accrescere in me la voglia smisurata di voler approfondire questo mondo.
 
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=.47\textwidth]{img/latex}
+\caption{\textbf{Interfaccia di Atom}.Scrittura del paper con Atom e linguaggio LaTex.}
+\label{latex}
+\end{center}
+\end{figure}
 % \begin{quote}
 % La musica non e` solo composizione. \\
 % Non è artigianato, non è un mestiere. \\
@@ -266,7 +313,6 @@ process = subtractive : phaser : master : mutes : meters;
 % \caption{Thinking Tetrahedral Today stages}
 % \end{center}
 % \end{table}%
-
 
 
 \vfill\null
