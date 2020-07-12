@@ -65,7 +65,7 @@ a Heroku tramite Wasm (WebAssembly), linguaggio di basso livello che permette di
 \begin{figure}[h]
 \begin{center}
 \includegraphics[width=.47\textwidth]{img/Superstereosynth}
-\caption{\textbf{Superstereosynth}. Interfaccia grafica completa.}
+\caption{\textbf{Superstereo Synth}. Interfaccia grafica completa su Heroku.}
 \label{superstereosynth}
 \end{center}
 \end{figure}
@@ -92,7 +92,7 @@ meters = lmeter, rmeter;
 \end{lstlisting}
 
 Il modulo di sintesi sottrattiva chiamato “SUBTRACTIVE” contiene al suo interno un generatore di rumore bianco e uno di dente di sega con frequenza fissa (da noi indipendentemente scelta), swichabili tramite un apposito pulsante. Il tutto va dentro un filtro risonante “Ladder” basato sul modello di Robert Moog con relativi controlli di f cut e Q factor, ed in seguito ad un cotrollo di ampiezza.
-Il modulo di sottrattiva è posto nella parte destra del synth.
+Il modulo di sottrattiva è posto nella parte sinistra del synth.
 
 
 
@@ -124,7 +124,7 @@ costruito tramite una sequenza di N allpass, come dal modello di Curtis Roads su
 “The Computer Music Tutorial” \cite{cr96cmt}, di cui il canale R dell'LFO agisce di fase opposta al
 canale L. Il segnale verrà reso stereofonico tramite la tecnica dello
 “Stereo Shuffling” (fig. \ref{stereoshuffler}), creando quindi due matrici SDM \cite{ab58} (somma-differenza) di
-modo da avere un knob su cui poter controllare l'apertura stereofonica, agendo da solo segnale solo
+modo da avere un knob su cui poter controllare l'apertura stereofonica, agendo da solo segnale
 monofonico (knob full sx) e superstereo (knob full dx). Lo “Superstereophaser”
 (così chiamato, non solo lui ma anche lo stesso synth, citando il film “Ritorno al futuro”), avrà 3 tipi di controlli
 tramite appositi knob:
@@ -211,9 +211,12 @@ phchop = superstereophaser :
  \end{lstlisting}
 
 Il tutto entrerà nella sezione chiamata “MASTER CONTROLS” nella quale avremo in ordine:
-- Pulsante “MUTE”, che chiude il segnale alla fine della catena (pre-fader)
-- Controllo del volume Master tramite un fader verticale con valori in scala logaritmica posto al centro del synth.
--Due Meters, sempre su scala logaritmica, posti al due lati della sezione Master.
+\begin{compactitem}
+\item Pulsante “MUTE”, che chiude il segnale alla fine della catena (pre-fader).
+\item Controllo del volume Master tramite un fader verticale con valori in scala logaritmica posto al centro del synth.
+\item Due Meters, sempre su scala logaritmica, posti al due lati della sezione Master.
+\end{compactitem}
+
 La sezione Master si trova nella parte centrale del nostro Synth.
 
 %-----------------------------------------------------
@@ -253,7 +256,7 @@ process = subtractive : phaser : master : mutes : meters;
 Devo ammettere che inizialmente l'idea di programmare da zero,
 in questo caso un synth completo, mi intimoriva parecchio; in fin dei conti
 però non è stato poi così complesso anzi, si è rivelato interessante e soprattutto
-molto divertente. Mi è piaciuto come durante il corso, non ci venisse richiesto semplicemente
+molto divertente. Mi è piaciuto come durante il corso non ci venisse richiesto semplicemente
 di "fare" una determinata cosa, ma venissimo guidati e indotti a ragionare su quali
 fossero le possibili strade da percorrere. Non conoscevo Faust, ma ho imparato e sto imparando a
 capirne le sue funzionalità e penso che sia un linguaggio abbastanza immediato e intuitivo,
@@ -268,8 +271,8 @@ affrontato con il linguaggio LaTeX (fig.\ref{latex}) per la scrittura di questo 
 di una futura pubblicazione o anche semplicemente per la stesura
 % (mi manca il termine)
 della mia tesi di laurea. In sostanza, posso dire che aver seguito questo corso mi ha dato l'opportunità di
-acquisire determinati valori aggiunti che non solo hanno arricchito il mio bagaglio di conoscenze,
-ma hanno fatto accrescere in me la voglia smisurata di voler approfondire questo mondo.
+acquisire determinati valori aggiunti, che non solo hanno arricchito il mio bagaglio di conoscenze,
+ma hanno anche fatto accrescere in me la voglia smisurata di voler approfondire questo mondo.
 
 \begin{figure}[h]
 \begin{center}
